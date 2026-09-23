@@ -1,9 +1,8 @@
 fastapi
 uvicorn
-python-telegram-bot[job-queue]==20.7
-requests
-openai
-psycopg2-binary
+python-telegram-bot[all]
 python-dotenv
 sqlalchemy
-python-multipart
+psycopg2-binary
+requests
+openai
