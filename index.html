@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BetMaster Pro - VIP Subscription</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>
+body{font-family:Arial;background:#0a0a0a;color:white;text-align:center;padding:20px}
+.card{background:#1a1a1a;border-radius:15px;padding:25px;margin:15px auto;max-width:380px;border:1px solid #333}
+.btn{background:#00ff88;color:#000;padding:15px 30px;border:none;border-radius:10px;font-weight:bold;font-size:18px;cursor:pointer;width:100%;margin-top:10px}
+input{width:90%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #333;background:#222;color:white}
+.badge{background:#00ff88;color:#000;padding:5px 10px;border-radius:5px;font-size:12px}
+a{color:#00ff88}
+</style>
+</head>
+<body>
+<h1>⚽ BetMaster Pro</h1>
+<p>AI Football Analysis - Join {{GROUP_USERNAME}}</p>
+
+<div class="card">
+<span class="badge">POPULAR</span>
+<h2>Weekly VIP - ₦2,000</h2>
+<p>✅ 10 predictions / day<br>✅ Any league you ask<br>✅ 7 days<br>✅ Over 1.5, X2, BTTS safe picks</p>
+<input type="text" id="tg_weekly" placeholder="Telegram ID (get from @userinfobot)">
+<input type="email" id="email_weekly" placeholder="Your Email">
+<button class="btn" onclick="pay(200000, 'weekly')">Pay ₦2,000 - Weekly</button>
+</div>
+
+<div class="card" style="border-color:#00ff88">
+<span class="badge">BEST VALUE - SAVE 40%</span>
+<h2>Monthly VIP - ₦5,000</h2>
+<p>✅ 10 predictions / day<br>✅ 300 predictions/month<br>✅ 30 days<br>✅ Priority support</p>
+<input type="text" id="tg_monthly" placeholder="Telegram ID">
+<input type="email" id="email_monthly" placeholder="Your Email">
+<button class="btn" onclick="pay(500000, 'monthly')">Pay ₦5,000 - Monthly</button>
+</div>
+
+<p style="font-size:12px;color:#888;margin-top:20px">⚠️ 18+ Analysis only. No win guarantee. Bet responsibly.<br>We do NOT handle bets. Odds from Bet9ja/SportyBet for analysis.<br>After payment, VIP auto-activates. Go back to Telegram bot.</p>
+
+<script>
+function pay(amount, plan){
+  var tg_id = document.getElementById('tg_'+plan).value.trim();
+  var email = document.getElementById('email_'+plan).value.trim();
+  if(!tg_id || !email){alert('Enter Telegram ID and Email'); return;}
+  if(isNaN(tg_id)){alert('Telegram ID must be numbers only. Get from @userinfobot'); return;}
+  
+  var handler = PaystackPop.setup({
+    key: '{{PUBLIC_KEY}}',
+    email: email,
+    amount: amount,
+    currency: 'NGN',
+    metadata: {telegram_id: tg_id, plan: plan, custom_fields: [{display_name:"Telegram ID", variable_name:"telegram_id", value:tg_id}]},
+    callback: function(response){
+      document.body.innerHTML = '<h1>Verifying payment...</h1><p>Please wait</p>';
+      fetch('/api/verify/'+response.reference+'?tg_id='+tg_id+'&plan='+plan)
+      .then(r=>r.json()).then(d=>{
+        if(d.status=='success'){
+          document.body.innerHTML = '<h1>✅ VIP Activated!</h1><p>Valid for '+d.days+' days</p><p>Go back to Telegram</p><a href="https://t.me/BetMaster_bot" style="background:#00ff88;color:#000;padding:15px 30px;border-radius:10px;text-decoration:none;display:inline-block;margin-top:20px">Open Telegram Bot</a>';
+        } else { 
+          alert('Payment verified but activation failed. Error: '+JSON.stringify(d)+' Send receipt to @BetMaster_bot'); 
+          window.location.reload();
+        }
+      });
+    },
+    onClose: function(){ alert('Payment cancelled'); }
+  });
+  handler.openIframe();
+}
+</script>
+</body>
+</html>
