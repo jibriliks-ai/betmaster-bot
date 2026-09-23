@@ -1,3 +1,38 @@
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import requests
+
+# Mount website
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/subscribe")
+@app.get("/pay")
+@app.get("/")
+async def website():
+    # Inject public key into html
+    with open("static/index.html") as f:
+        html = f.read().replace("{{PUBLIC_KEY}}", os.getenv("PAYSTACK_PUBLIC_KEY",""))
+    return FileResponse("static/index.html") if False else HTMLResponse(html)
+
+from fastapi.responses import HTMLResponse
+
+@app.get("/api/verify/{reference}")
+async def verify_pay(reference: str, tg_id: int, plan: str):
+    secret = os.getenv("PAYSTACK_SECRET")
+    r = requests.get(f"https://api.paystack.co/transaction/verify/{reference}", 
+                     headers={"Authorization": f"Bearer {secret}"}).json()
+    if r['data']['status'] == 'success':
+        days = 7 if plan=='weekly' else 30
+        db = SessionLocal()
+        user = get_user(db, tg_id)
+        from datetime import timedelta
+        user.is_vip = True
+        user.vip_expiry = date.today() + timedelta(days=days)
+        db.commit()
+        db.close()
+        return {"status":"success", "days":days}
+    return {"status":"failed"}
+
 import os, asyncio
 from datetime import date, datetime, timedelta
 from fastapi import FastAPI, Request
