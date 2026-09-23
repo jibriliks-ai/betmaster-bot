@@ -89,5 +89,11 @@ if __name__=="__main__":
     import threading; loop=asyncio.new_event_loop()
     def start_loop():
         asyncio.set_event_loop(loop); loop.run_until_complete(run_bot()); loop.run_forever()
+
+
+    try:
+    ADMIN_ID = int(str(os.getenv("ADMIN_ID","0")).strip().split()[0])
+except:
+    ADMIN_ID = 0
     threading.Thread(target=start_loop, daemon=True).start()
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT",10000)))
