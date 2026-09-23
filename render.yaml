@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: betmaster-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: BOT_TOKEN
+        sync: false
+      - key: API_FOOTBALL_KEY
+        sync: false
+      - key: OPENROUTER_KEY
+        sync: false
+      - key: PAYSTACK_LINK
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: GROUP_USERNAME
+        value: "@betmasterpro"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: betmaster-db
+          property: connectionString
+databases:
+  - name: betmaster-db
+    plan: free
