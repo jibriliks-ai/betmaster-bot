@@ -13,12 +13,18 @@ services:
         sync: false
       - key: OPENROUTER_KEY
         sync: false
-      - key: PAYSTACK_LINK
+      - key: PAYSTACK_PUBLIC_KEY
         sync: false
+      - key: PAYSTACK_SECRET
+        sync: false
+      - key: PAYSTACK_LINK
+        value: /subscribe
       - key: ADMIN_ID
         sync: false
       - key: GROUP_USERNAME
         value: "@betmasterpro"
+      - key: WEBSITE_URL
+        sync: false
       - key: DATABASE_URL
         fromDatabase:
           name: betmaster-db
